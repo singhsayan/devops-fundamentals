@@ -1,0 +1,74 @@
+stages:
+  - build
+  - test
+  - push
+  - deploy 
+
+variables:
+  DEPLOY_ENV: "production"
+  GIT_LAB_USER_KEY: "this-is-my-secret-key"
+  IMAGE_NAME: registry.gitlab.com/singhsayan10/multicontainerapp
+  POSTGRES_DB: mydatabase
+  POSTGRES_USER: myuser
+  POSTGRES_PASSWORD: mypassword
+
+before_script:
+  - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+
+build_job:
+  stage: build
+  script:
+    - echo "This build is done using command <docker build -t tag.>"
+    - docker build -t $IMAGE_NAME:latest .
+    - docker push $IMAGE_NAME:latest
+  tags:
+    - dev1
+
+test_job:
+  stage: test
+  script:
+    - mkdir -p logs
+    - echo "This $CI_PROJECT_NAME is testing our docker build"
+    - echo "These are my test results" > logs/app.log
+  artifacts:
+    paths:
+      - logs/
+    expire_in: 1 week
+  tags:
+    - dev1
+
+push_job:
+  stage: push
+  script:
+    - echo "This"
+    - echo "is pushing to docker hub done by $CI_COMMIT_AUTHOR"
+  tags:
+    - dev1
+
+deploy_job:
+  stage: deploy
+  image: docker:latest
+  script:
+    - docker pull $IMAGE_NAME:latest
+    - docker run -d -p 3000:3000 --name node-app $IMAGE_NAME:latest
+    - echo "This log is from $CI_JOB_STAGE" >> logs/app.log
+  artifacts:
+    paths:
+      - logs/
+    expire_in: 1 week
+  tags:
+    - dev1
+
+dev_test_job:
+  stage: test
+  script:
+    - echo "Tested for dev using $GIT_LAB_USER_KEY"
+  tags:
+    - dev1
+
+prod_test_job:
+  stage: test
+  script:
+    - echo "Tested for prod"
+  tags:
+    - dev1
