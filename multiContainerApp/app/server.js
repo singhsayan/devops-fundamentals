@@ -12,20 +12,21 @@ const db = new Client({
 
 db.connect();
 
-app.get("/", (req, res) => {
+app.get("/", (req, res) =>{
     res.send("Hello from Node.js with PostgreSQL");
 });
 
-app.get("/users", async (req, res) => { 
-    try {
+app.get("/users", async (req, res) =>{ 
+    try{
         const result = await db.query('SELECT * FROM users');
         res.json(result.rows);
-    } catch (err) {
+    } 
+    catch (err){
         res.status(500).send(err.message);
     }
 });
 
 const PORT = process.env.PORT || 3000;  
-app.listen(PORT, () => {
+app.listen(PORT, () =>{
     console.log(`App is listening at http://localhost:${PORT}`);
 });
