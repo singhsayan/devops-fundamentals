@@ -1,0 +1,49 @@
+version: "3.8"
+services:
+  app:
+    build: .
+    depends_on:
+      - db1
+      - db2
+      - redis
+    environment:
+      - PORT=5000
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=urlshortener
+    ports:
+      - "5000:5000"
+    deploy:
+      replicas: 3  # Use `--scale` with Docker Compose if not using Swarm
+
+  db1:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: urlshortener1
+    ports:
+      - "5432:5432"
+
+  db2:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: urlshortener2
+    ports:
+      - "5433:5432"
+
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+
+  nginx:
+    image: nginx:latest
+    volumes:
+      - ./src/config/nginx.conf:/etc/nginx/nginx.conf
+    ports:
+      - "80:80"
+    depends_on:
+      - app
