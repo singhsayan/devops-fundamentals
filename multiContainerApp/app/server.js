@@ -1,12 +1,12 @@
 const express = require('express');
-const { Client } = require('pg');  // Fix import
+const { Client } = require('pg');  
 const app = express();
 
-const db = new Client({  // Fix database initialization
+const db = new Client({  
     host: process.env.DB_HOST,
     port: process.env.DB_PORT,
     user: process.env.DB_USER,
-    database: process.env.DB_NAME,  // Use `database`, not `name`
+    database: process.env.DB_NAME,  
     password: process.env.DB_PASSWORD
 });
 
@@ -16,7 +16,7 @@ app.get("/", (req, res) => {
     res.send("Hello from Node.js with PostgreSQL");
 });
 
-app.get("/users", async (req, res) => {  // Fix async handling
+app.get("/users", async (req, res) => { 
     try {
         const result = await db.query('SELECT * FROM users');
         res.json(result.rows);
@@ -25,7 +25,7 @@ app.get("/users", async (req, res) => {  // Fix async handling
     }
 });
 
-const PORT = process.env.PORT || 3000;  // Define PORT
+const PORT = process.env.PORT || 3000;  
 app.listen(PORT, () => {
     console.log(`App is listening at http://localhost:${PORT}`);
 });
